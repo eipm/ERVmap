@@ -56,19 +56,19 @@ RUN add-apt-repository ppa:deadsnakes/ppa \
 #===========================#
 # Install SAMTOOLS & HTSLIB #
 #===========================#
-ENV SAMTOOLS_VERSION 1.9
-ENV HTSLIB_VERSION 1.9
-ENV samtools_dir /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}
-ENV htslib_dir ${samtools_dir}/htslib-${HTSLIB_VERSION}
-RUN wget -O samtools-${SAMTOOLS_VERSION}.tar.bz2 https://github.com/samtools/samtools/releases/download/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2 \
-	&& tar jxf samtools-${SAMTOOLS_VERSION}.tar.bz2 -C ${PROGRAMS} \
-	&& rm samtools-${SAMTOOLS_VERSION}.tar.bz2 \
-	&& cd ${samtools_dir} \
-	&& make \
-	&& make install \
-	&& cd htslib-${HTSLIB_VERSION} \
-	&& make \
-	&& make install
+# ENV SAMTOOLS_VERSION 1.9
+# ENV HTSLIB_VERSION 1.9
+# ENV samtools_dir /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}
+# ENV htslib_dir ${samtools_dir}/htslib-${HTSLIB_VERSION}
+# RUN wget -O samtools-${SAMTOOLS_VERSION}.tar.bz2 https://github.com/samtools/samtools/releases/download/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2 \
+# 	&& tar jxf samtools-${SAMTOOLS_VERSION}.tar.bz2 -C ${PROGRAMS} \
+# 	&& rm samtools-${SAMTOOLS_VERSION}.tar.bz2 \
+# 	&& cd ${samtools_dir} \
+# 	&& make \
+# 	&& make install \
+# 	&& cd htslib-${HTSLIB_VERSION} \
+# 	&& make \
+# 	&& make install
 # #===========================#
 # # Install BCFTOOLS			#
 # #===========================#
