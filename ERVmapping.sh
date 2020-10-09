@@ -15,8 +15,8 @@ logMsg() {
     fi
 } 
 
-if [ -z ${CPUS+x} ];then $CPUS=1;fi
-if [ -z ${LIMIT_RAM+x} ];then $LIMIT_RAM=35129075129
+if [ -z ${CPUS+x} ];then export CPUS=1;fi
+if [ -z ${LIMIT_RAM+x} ];then export LIMIT_RAM=35129075129;fi
 if [ -z ${READ_1+x} ];then 
     logMsg "ERROR" "Read 1 not set"
 fi
