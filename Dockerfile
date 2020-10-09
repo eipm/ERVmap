@@ -28,7 +28,7 @@ ENV APP_NAME="ERVmap" \
 
 
 RUN mkdir -p /scripts
-COPY STAR_alignment.sh /scripts
+COPY ERVmapping.sh /scripts
 # COPY normalize_deseq.r /scripts
 # COPY *.pl /bin/
 COPY ERVmap.bed /scripts
