@@ -31,7 +31,7 @@ if [[ ! -e "$READ_2" ]];then
 fi
 
 logMsg "INFO" "---- Alignment"
-STAR --genomeDir /resources --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMateGapMax 1000000 --readFilesIn $READ_1 $READ_2 --readFilesCommand zcat
+STAR --genomeDir /resources --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READ_1 $READ_2 --readFilesCommand zcat
 logMsg "INFO" "---- Alignment Complete"
 
 logMsg "INFO" "---- Indexing"
