@@ -39,6 +39,6 @@ samtools index Aligned.sortedByCoord.out.bam
 logMsg "INFO" "---- Indexing Complete"
 
 logMsg "INFO" "---- Finding ERVs"
-coverageBed -nonamecheck -a /scripts/ERVmap.bed -b Aligned.sortedByCoord.out.bam -counts > ERVresults.txt
+coverageBed -nonamecheck -a /scripts/ERVmap.bed -b Aligned.sortedByCoord.out.bam -counts -sorted > ERVresults.txt
 logMsg "INFO" "---- Finding ERVs complete"
 #~/project/genome/hg38cut_L1_ERV.bed -counts > $i.tx
