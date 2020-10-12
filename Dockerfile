@@ -1,4 +1,4 @@
-FROM eipm/bioinformatics:latest as bioinformatics
+FROM ubuntu:latest as bioinformatics_base
 
 #===============================#
 # Docker Image Configuration	#
@@ -6,72 +6,73 @@ FROM eipm/bioinformatics:latest as bioinformatics
 LABEL vendor="Englander Institute for Precision Medicine" \
 		description="ERVmap" \
 		maintainer="ans2077@med.cornell.edu" \
-		base_image="eipm/bioinformatics" \
+		base_image="ubuntu" \
 		base_image_version="latest" \
     	base_image_SHA256="sha256:fc04b2781f41f76c5b126ec26c0c0c26c7fc047318347a2112856253a88bb01d"
 
 ENV APP_NAME="ERVmap" \
 	TZ='US/Eastern' \
 	PROGRAMS="opt"
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# RUN apt-get update \
-# 	&& apt-get upgrade -y --fix-missing \
-# 	&& apt-get install build-essential -y \
-# 	&& apt-get install -y \
-# 	software-properties-common \
-# 	cufflinks \
-# 	&& rm -rf /var/lib/apt/lists/*
-# RUN add-apt-repository ppa:deadsnakes/ppa \
-# 	&& apt update \
-# 	&& apt install python3.8 \
-# 	&& rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+	&& apt-get upgrade -y --fix-missing \
+	&& apt-get install build-essential -y \
+	&& apt-get install -y \
+ 	vim \
+	emacs \
+	bedtools \
+	wget \
+	# bcftools \
+	# vcftools \
+	# bwa \
+	libncurses5-dev \
+	libz-dev \
+	libbz2-dev \
+	liblzma-dev \
+	&& rm -rf /var/lib/apt/lists/*
 
+#===========================#
+# Install SAMTOOLS & HTSLIB #
+#===========================#
+ENV SAMTOOLS_VERSION 1.9
+ENV HTSLIB_VERSION 1.9
+ENV samtools_dir /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}
+ENV htslib_dir ${samtools_dir}/htslib-${HTSLIB_VERSION}
+RUN wget -O samtools-${SAMTOOLS_VERSION}.tar.bz2 https://github.com/samtools/samtools/releases/download/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2 \
+	&& tar jxf samtools-${SAMTOOLS_VERSION}.tar.bz2 -C ${PROGRAMS} \
+	&& rm samtools-${SAMTOOLS_VERSION}.tar.bz2 \
+	&& cd ${samtools_dir} \
+	&& make \
+	&& make install \
+	&& cd htslib-${HTSLIB_VERSION} \
+	&& make \
+	&& make install
 
+#===========================#
+# Install STAR              #
+#===========================#
+ENV STAR_VERSION 2.7.6a
+ENV star_dir /${PROGRAMS}/STAR-${STAR_VERSION}
+RUN wget -O STAR-${STAR_VERSION}.tar.gz https://github.com/alexdobin/STAR/archive/2.7.6a.tar.gz \
+	&& tar xzf STAR-${STAR_VERSION}.tar.gz -C ${PROGRAMS} \
+	&& rm STAR-${STAR_VERSION}.tar.gz \
+	&& cd ${star_dir}/source \
+	&& make STAR 
+RUN ln -s ${star_dir}/source/STAR /usr/local/bin/
+
+FROM bioinformatics_base
+COPY --from=bioinformatics_base /usr/local/bin/ /usr/local/bin
+COPY --from=bioinformatics_base /usr/bin/ /usr/bin
+COPY --from=bioinformatics_base /bin/ /bin
+COPY --from=bioinformatics_base ${star_dir}/source/STAR ${star_dir}/source/STAR
+
+#===========================#
+# Installing tools          #
+#===========================#
 RUN mkdir -p /scripts
 COPY ERVmapping.sh /scripts
-# COPY normalize_deseq.r /scripts
-# COPY *.pl /bin/
-COPY ERVmap.bed /scripts
-
-# RUN cpan install CPAN && cpan reload cpan && cpan App:cpanminus && cpanm File::Type
-
-#===========================#
-# Security Updates			#
-#===========================#
-# ENV GHOSTSCRIPT_VER 9.52
-# ENV GS_VER 952
-# ENV GHOSTSCRIPT_DIR /${PROGRAMS}/ghostscript-${GHOSTSCRIPT_VER}
-# RUN wget -O ghostscript-${GHOSTSCRIPT_VER}.tar.gz https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs952/ghostscript-9.52.tar.gz \
-# 	&& tar -vxzf ghostscript-${GHOSTSCRIPT_VER}.tar.gz -C ${PROGRAMS} \
-# 	&& rm ghostscript-${GHOSTSCRIPT_VER}.tar.gz \
-# 	&& cd ${GHOSTSCRIPT_DIR} \
-# 	&& ./configure \
-# 	&& make \
-# 	&& make install
-# WORKDIR /bin
-# RUN wget http://ccb.jhu.edu/software/tophat/downloads/tophat-2.1.1.Linux_x86_64.tar.gz
-# # RUN wget --default-page=bowtie2-2.3.2-linux-x86_64.zip http://sourceforge.net/projects/bowtie-bio/files/bowtie2/2.3.2/bowtie2-2.3.2-linux-x86_64.zip/
-# RUN wget http://graphics.med.yale.edu/trim/btrim64
-# RUN wget http://cole-trapnell-lab.github.io/cufflinks/assets/downloads/cufflinks-2.2.1.Linux_x86_64.tar.gz
-
-# #Unzip TopHat and Bowtie2
-# RUN tar zxvf tophat-2.1.1.Linux_x86_64.tar.gz
-# RUN tar xzvf cufflinks-2.2.1.Linux_x86_64.tar.gz
-# # RUN unzip bowtie2-2.3.2-linux-x86_64.zip
-
-# #Remove compressed files
-# RUN rm tophat-2.1.1.Linux_x86_64.tar.gz
-# RUN rm cufflinks-2.2.1.Linux_x86_64.tar.gz
-# # RUN rm bowtie2-2.3.2-linux-x86_64.zip
-
-
-# #Add TopHat and bowtie2 to the path variable
-# ENV PATH $PATH:/bin/tophat-2.1.1.Linux_x86_64
-# # ENV PATH $PATH:/bin/bowtie2-2.3.2
-# ENV PATH $PATH:/bin/cufflinks-2.2.1.Linux_x86_64
-# ENV PATH $PATH:/bin
-
-# RUN ln -s /bin/btrim64 /bin/btrim && chmod ugo+x /bin/btrim64 
 
 #Set Working Directory
-WORKDIR /
+WORKDIR /scripts
+CMD [ "/scripts/ERVmapping.sh" ]
