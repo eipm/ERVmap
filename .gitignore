@@ -1,2 +1,5 @@
 *fastq.gz
 *fastq
+results/
+data/
+tmp/s
