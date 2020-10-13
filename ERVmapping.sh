@@ -89,7 +89,7 @@ logMsg "INFO" "-------- START (mode: $MODE) ---------"
 if [[ "$MODE" == "STAR" || "$MODE" == "ALL" ]]; then
     logMsg "INFO" "---- Alignment ----"
     logMsg "DEBUG" "$(ls -la /results)"
-    STAR --genomeDir /genome --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READ1 $READ_2 --readFilesCommand zcat --outFileNamePrefix /results/$OUT_PREFIX
+    STAR --genomeDir /genome --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READ1 $READ2 --readFilesCommand zcat --outFileNamePrefix /results/$OUT_PREFIX
     logMsg "INFO" "---- Alignment Complete ----"
     if [[ ! -e  "$BAM" ]];then
         logMsg "ERROR" "BAM files not available:($BAM)"
