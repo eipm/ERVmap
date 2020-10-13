@@ -95,7 +95,7 @@ if [[ "$MODE" == "STAR" || "$MODE" == "ALL" ]]; then
         logMsg "ERROR" "BAM files not available:($BAM)"
     fi
     logMsg "INFO" "---- Indexing"
-    samtools index "$BAM"
+    samtools index -@ $CPUS "$BAM"
     logMsg "INFO" "---- Indexing Complete"
 fi
 
