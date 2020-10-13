@@ -75,7 +75,7 @@ if [ -z ${OUT_PREFIX+x} ];then
     OUT_PREFIX="./RESULTS/Alignment_$RANDOM"
     logMsg "WARN" "This prefix will be used as output: $OUT_PREFIX"
 fi 
-BAM="$OUT_PREFIX.Aligned.sortedByCoord.out.bam"
+BAM="$OUT_PREFIX""Aligned.sortedByCoord.out.bam"
 
 logMsg "DEBUG" "CPUs:($CPUS)"
 logMsg "DEBUG" "Limit RAM:($LIMIT_RAM)"
