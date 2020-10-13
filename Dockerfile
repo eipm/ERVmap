@@ -23,9 +23,6 @@ RUN apt-get update \
 	emacs \
 	bedtools \
 	wget \
-	# bcftools \
-	# vcftools \
-	# bwa \
 	libncurses5-dev \
 	libz-dev \
 	libbz2-dev \
@@ -61,10 +58,14 @@ RUN wget -O STAR-${STAR_VERSION}.tar.gz https://github.com/alexdobin/STAR/archiv
 	&& make STAR 
 RUN ln -s ${star_dir}/source/STAR /usr/local/bin/
 
+
+#===========================#
+# Production layer          #
+#===========================#
 FROM bioinformatics_base
 COPY --from=bioinformatics_base /usr/local/bin/ /usr/local/bin
-COPY --from=bioinformatics_base /usr/bin/ /usr/bin
-COPY --from=bioinformatics_base /bin/ /bin
+COPY --from=bioinformatics_base /usr/bin/coverageBed /usr/bin/coverageBed
+COPY --from=bioinformatics_base /usr/bin/bedtools /usr/bin/bedtools
 COPY --from=bioinformatics_base ${star_dir}/source/STAR ${star_dir}/source/STAR
 
 #===========================#
@@ -75,4 +76,4 @@ COPY ERVmapping.sh /scripts
 
 #Set Working Directory
 WORKDIR /scripts
-CMD [ "/scripts/ERVmapping.sh" ]
+ENTRYPOINT [ "/scripts/ERVmapping.sh" ]

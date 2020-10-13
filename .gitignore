@@ -1,5 +1,6 @@
+.DS_Store
 *fastq.gz
 *fastq
 results/
 data/
-tmp/s
+tmp/
