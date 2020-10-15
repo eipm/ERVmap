@@ -55,10 +55,8 @@ process STARAlignment2 {
     val(cpus) from params.cpus
     val(limitMemory) from params.limitMemory
     val(debug) from params.debug
-    
+    // tuple val(samples), fastqs from pairFiles_ch
     // file read1 from pairFiles.getA
-    tuple val(sample), file(read1), file(read2) from pairFiles_ch
-    
 
     // path inputDir from params.inputDir
 
@@ -67,11 +65,11 @@ process STARAlignment2 {
     // val() into star_bam_ch
     // val() into star_bai_ch
 
-    // """
-    // echo 'STAR:' $mode
-    // """
-    shell:
-    template 'ERVmapping_nf.sh'
+    """
+    echo 'STAR:' "$mode $pairFiles_ch.getVal()"
+    """
+    // shell:
+    // template 'ERVmapping_nf.sh'
 }
 
 process ERVcounting {
