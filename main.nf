@@ -37,9 +37,6 @@ if (!params.outPrefix) {
 }
 
 pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 2, checkIfExists: true )
-// pairFiles_ch.view()
-// println( pairFiles.view() )
-// println ( pairFiles.countFastq() )
 
 process STARAlignment {
     // tag ${sample}
@@ -64,7 +61,7 @@ process STARAlignment {
     tuple val(sample), file(reads) from pairFiles_ch
 
     output:
-    path ( "./results/${outPrefix}Aligned.sortedByCoord.out.bam" ) into star_bam_ch
+    path ( "results/${outPrefix}Aligned.sortedByCoord.out.bam" ) into star_bam_ch
 
     // """
     // echo 'STAR:' "$mode - $sample - $reads"
@@ -98,7 +95,7 @@ process ERVcounting {
 
 //     shell:
     """
-    echo 'BED' $mode $msg
+    echo 'BED' $mode $outPrefix
     """
 //     //template 'ERVmapping_nf.sh'
 }
