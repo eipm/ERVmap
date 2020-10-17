@@ -41,7 +41,7 @@ pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 
 // println( pairFiles.view() )
 // println ( pairFiles.countFastq() )
 
-process STARAlignment2 {
+process STARAlignment {
     // tag ${sample}
     
     // executor configuration
@@ -50,7 +50,7 @@ process STARAlignment2 {
     scratch true
     
     // other configuration
-    echo true
+    echo false
     errorStrategy 'terminate'
 
     mode='STAR'
@@ -64,8 +64,7 @@ process STARAlignment2 {
     tuple val(sample), file(reads) from pairFiles_ch
 
     output:
-    val(msg) into star_msg_ch
-    path ( "/results/${outPrefix}" ) into star_bam_ch
+    path ( "${launchDir}/results/${outPrefix}" ) into star_bam_ch
 
     // """
     // echo 'STAR:' "$mode - $sample - $reads"
