@@ -52,7 +52,7 @@ process STARAlignment {
     // other configuration
     echo false
     errorStrategy 'terminate'
-
+    
     mode='STAR'
 
     input:
@@ -64,7 +64,7 @@ process STARAlignment {
     tuple val(sample), file(reads) from pairFiles_ch
 
     output:
-    path ( "${launchDir}/results/${outPrefix}" ) into star_bam_ch
+    path ( "./results/${outPrefix}Aligned.sortedByCoord.out.bam" ) into star_bam_ch
 
     // """
     // echo 'STAR:' "$mode - $sample - $reads"

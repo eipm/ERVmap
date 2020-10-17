@@ -97,7 +97,7 @@ logMsg "INFO" "-------- START (mode: $MODE) ---------"
 
 if [[ "$MODE" == "STAR" || "$MODE" == "ALL" ]]; then
     logMsg "INFO" "---- Alignment ----"
-    STAR --genomeDir /genome --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READS --readFilesCommand zcat --outFileNamePrefix /results/$OUT_PREFIX
+    echo "STAR --genomeDir /genome --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READS --readFilesCommand zcat --outFileNamePrefix /results/$OUT_PREFIX"
     logMsg "INFO" "---- Alignment Complete ----"
     if [[ ! -e  "$BAM" ]];then
         logMsg "DEBUG" "$(pwd);$(ls -la ./)"
