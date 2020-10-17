@@ -10,8 +10,9 @@ function usage() {
     echo "Usage: ERVmapping.sh <-r1|--read1> SAMPLE_1.fastq.gz <-r2|--read2> SAMPLE_1.fastq.gz [-o|--output] results/SAMPLE <-m|--mode> {STAR|BED|ALL} [-c|--cpus] Ncpus [-l|--limit-ram] 35129075129 [-d|--debug]"
 }
 
-READ1="!{read1}"
-READ2="!{read2}"
+READS="!{reads}"
+READ1="${READS[0]}"
+READ2="${READS[1]}"
 MODE="!{mode}"
 OUT_PREFIX="!{outPrefix}"
 CPUS=!{cpus}
@@ -92,7 +93,7 @@ logMsg "DEBUG" "Read1:($READ1)"
 logMsg "DEBUG" "Read2:($READ2)"
 logMsg "DEBUG" "OUT_PREFIX:($OUT_PREFIX)"
 logMsg "DEBUG" "MODE:($MODE)"
-
+exit 
 logMsg "INFO" "-------- START (mode: $MODE) ---------"
 
 if [[ "$MODE" == "STAR" || "$MODE" == "ALL" ]]; then

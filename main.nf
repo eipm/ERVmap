@@ -2,35 +2,42 @@
 
 
 // check parameters
-if (!params.read1) {
-    exit 1, "read1 parameter is missing."
+// if (!params.read1) {
+//     exit 1, "read1 parameter is missing."
+// }
+// if (!params.read2) {
+//     exit 1, "read2 parameter is missing."
+// }
+// if (!new File(params.read1).exists()) {
+//     exit 1, "The read1 file does not exists".params.read1."\n"
+// }
+// if (!new File(params.read2).exists()) {
+//     exit 1, "The read2 file does not exists.".params.read2."\n"
+// }
+// if (!params.genome) {
+//     exit 1, "genome parameter is missing."
+// }
+// if (!new File(params.genome).exists()) {
+//     exit 1, "The indexed genome does not exists.".params.genome."\n"
+// // }
+// if (!params.ervbed) {
+//     exit 1, "ERVbed parameter is missing."
+// }
+// if (!new File(params.ervbed).exists()) {
+//     exit 1, "The ERV bed file does not exists.".params.ervbed."\n"
+// }
+if (!params.inputDir) {
+    exit 1, "inputDir parameter is missing."
 }
-if (!params.read2) {
-    exit 1, "read2 parameter is missing."
-}
-if (!new File(params.read1).exists()) {
-    exit 1, "The read1 file does not exists".params.read1."\n"
-}
-if (!new File(params.read2).exists()) {
-    exit 1, "The read2 file does not exists.".params.read2."\n"
-}
-if (!params.genome) {
-    exit 1, "genome parameter is missing."
-}
-if (!new File(params.genome).exists()) {
-    exit 1, "The indexed genome does not exists.".params.genome."\n"
-}
-if (!params.ervbed) {
-    exit 1, "ERVbed parameter is missing."
-}
-if (!new File(params.ervbed).exists()) {
-    exit 1, "The ERV bed file does not exists.".params.ervbed."\n"
+if ( !new File(params.inputDir).exists()) {
+    exit 1, "The input folder does not exists."+params.inputDir+"\n"
 }
 if (!params.outPrefix) {
     exit 1, "Output prefix parameter is missing."
 }
 
 pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 2, checkIfExists: true )
+// pairFiles_ch.view()
 // println( pairFiles.view() )
 // println ( pairFiles.countFastq() )
 
@@ -49,27 +56,22 @@ process STARAlignment2 {
     mode='STAR'
 
     input:
-    val(msg) from params.msg
     val(outPrefix) from params.outPrefix
     val(mode) from mode
     val(cpus) from params.cpus
     val(limitMemory) from params.limitMemory
     val(debug) from params.debug
-    // tuple val(samples), fastqs from pairFiles_ch
-    // file read1 from pairFiles.getA
-
-    // path inputDir from params.inputDir
+    tuple val(sample), file(reads) from pairFiles_ch
 
     output:
-    val(msg) into star_bam_ch
-    // val() into star_bam_ch
-    // val() into star_bai_ch
+    val(msg) into star_msg_ch
+    path ( "/results/${outPrefix}" ) into star_bam_ch
 
-    """
-    echo 'STAR:' "$mode $pairFiles_ch.getVal()"
-    """
-    // shell:
-    // template 'ERVmapping_nf.sh'
+    // """
+    // echo 'STAR:' "$mode - $sample - $reads"
+    // """
+    shell:
+    template 'ERVmapping_nf.sh'
 }
 
 process ERVcounting {
@@ -84,10 +86,13 @@ process ERVcounting {
     echo true
     errorStrategy 'terminate'
     mode = 'BED'
+    stageInMode 'symlink'
     
     input:
-    val(msg) from star_bam_ch
+    path data from star_bam_ch
     val(mode) from mode
+    val(outPrefix) from params.outPrefix
+    val(debug) from params.debug
 
     output: 
     // stdout results

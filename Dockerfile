@@ -71,8 +71,9 @@ COPY --from=bioinformatics_base ${star_dir}/source/STAR ${star_dir}/source/STAR
 #===========================#
 # Installing tools          #
 #===========================#
-RUN mkdir -p /scripts
+RUN mkdir -p /scripts /resources /results
 COPY ERVmapping.sh /scripts
+COPY ERVmap.bed /resources
 
 #Set Working Directory
 WORKDIR /scripts
