@@ -73,6 +73,7 @@ COPY --from=bioinformatics_base ${star_dir}/source/STAR ${star_dir}/source/STAR
 #===========================#
 RUN mkdir -p /scripts /resources /results
 COPY ERVmapping.sh /scripts
+COPY templates/ERVmapping_nf.sh /scripts
 COPY ERVmap.bed /resources
 
 #Set Working Directory
