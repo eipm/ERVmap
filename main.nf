@@ -37,6 +37,7 @@ if (!params.outPrefix) {
 }
 
 pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 2, checkIfExists: true )
+results_ch = Channel.fromPath( "./results")
 
 process STARAlignment {
     // tag ${sample}
@@ -53,7 +54,7 @@ process STARAlignment {
     mode='STAR'
 
     input:
-    val(outPrefix) from params.outPrefix
+    val(outPrefix) from params.outPrefix    
     val(mode) from mode
     val(cpus) from params.cpus
     val(limitMemory) from params.limitMemory
@@ -61,7 +62,7 @@ process STARAlignment {
     tuple val(sample), file(reads) from pairFiles_ch
 
     output:
-    path ( "results/${outPrefix}Aligned.sortedByCoord.out.bam" ) into star_bam_ch
+    path ( "./results/${outPrefix}Aligned.sortedByCoord.out.bam" ) into star_bam_ch
 
     // """
     // echo 'STAR:' "$mode - $sample - $reads"
@@ -77,7 +78,7 @@ process ERVcounting {
     time '3h'
 //     memory '8.GB'
     scratch true
-    
+
     // other configuration
     echo true
     errorStrategy 'terminate'
@@ -95,7 +96,8 @@ process ERVcounting {
 
 //     shell:
     """
-    echo 'BED' $mode $outPrefix
+    echo 'BED' $mode 
+    ls -la ./
     """
 //     //template 'ERVmapping_nf.sh'
 }

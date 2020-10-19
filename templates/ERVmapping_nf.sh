@@ -40,10 +40,10 @@ if [ -z ${MODE+x} ];then
 fi
 
 if [ -z ${OUT_PREFIX+x} ];then
-    OUT_PREFIX="./results/Alignment_$RANDOM"
+    OUT_PREFIX="$RANDOM""_"
     logMsg "WARN" "This prefix will be used as output: $OUT_PREFIX"
 fi 
-BAM="/results/$OUT_PREFIX""Aligned.sortedByCoord.out.bam"
+BAM="./results/$OUT_PREFIX""Aligned.sortedByCoord.out.bam"
 
 logMsg "DEBUG" "CPUs:($CPUS)"
 logMsg "DEBUG" "Limit RAM:($LIMIT_RAM)"
@@ -54,8 +54,9 @@ logMsg "DEBUG" "MODE:($MODE)"
 logMsg "INFO" "-------- START (mode: $MODE) ---------"
 
 if [[ "$MODE" == "STAR" || "$MODE" == "ALL" ]]; then
+    if [[ ! -e "$BAM" ]];then
     logMsg "INFO" "---- Alignment ----"
-    STAR --genomeDir /genome --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READS --readFilesCommand zcat --outFileNamePrefix results/$OUT_PREFIX
+    STAR --genomeDir /genome --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READS --readFilesCommand zcat --outFileNamePrefix ./results/$OUT_PREFIX
     logMsg "INFO" "---- Alignment Complete ----"
     if [[ ! -e  "$BAM" ]];then
         logMsg "DEBUG" "PWD: $(pwd);$(ls -la ./)"
@@ -65,6 +66,10 @@ if [[ "$MODE" == "STAR" || "$MODE" == "ALL" ]]; then
     logMsg "INFO" "---- Indexing"
     samtools index -@ $CPUS "$BAM"
     logMsg "INFO" "---- Indexing Complete"
+    else
+        # BAM file already exists, skipping
+        logMsg "WARN" "BAM file already exists; skipping this step"
+    fi
 fi
 
 if [[ "$MODE" == "BED" || "$MODE" == "ALL" ]]; then
