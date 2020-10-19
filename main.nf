@@ -86,11 +86,11 @@ process ERVcounting {
     stageInMode 'symlink'
     
     input:
-    path data from star_bam_ch
+    path (bam) from star_bam_ch
     val(mode) from mode
     val(outPrefix) from params.outPrefix
     val(debug) from params.debug
-
+    
     output: 
     path ("./results/")
 
