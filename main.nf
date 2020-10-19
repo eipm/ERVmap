@@ -62,7 +62,7 @@ process STARAlignment {
     tuple val(sample), file(reads) from pairFiles_ch
 
     output:
-    path ( "./results/${outPrefix}Aligned.sortedByCoord.out.bam" ) into star_bam_ch
+    path ( "results/${outPrefix}Aligned.sortedByCoord.out.bam" ) into star_bam_ch
 
     // """
     // echo 'STAR:' "$mode - $sample - $reads"
@@ -90,7 +90,7 @@ process ERVcounting {
     val(mode) from mode
     val(outPrefix) from params.outPrefix
     val(debug) from params.debug
-    
+
     output: 
     path ("./results/")
 

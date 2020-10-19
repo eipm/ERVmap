@@ -74,7 +74,7 @@ if [[ "$MODE" == "STAR" || "$MODE" == "ALL" ]]; then
 fi
 
 if [[ "$MODE" == "BED" || "$MODE" == "ALL" ]]; then
-    if [[ -z $BAM ]] BAM="!{bam}"
+    if [[ -z $BAM ]];then BAM="${bam}";fi
     if [[ ! -e "$BAM" ]];then
         logMsg "ERROR" "Cannot find BAM file: ( $BAM )"
     fi
