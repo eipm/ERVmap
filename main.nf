@@ -90,9 +90,11 @@ process ERVcounting {
     val(mode) from mode
     val(outPrefix) from params.outPrefix
     val(debug) from params.debug
-
+    val(cpus) from params.cpus
+    val(limitMemory) from params.limitMemory
+    
     output: 
-    path ("./results/")
+    path ("results/") into results
 
     // """
     // echo 'BED' $mode 
@@ -100,10 +102,10 @@ process ERVcounting {
     // """
 
     shell:
-    template 'ERVmapping_nf.sh'
+    template "ERVmapping_nf.sh"
 }
 
-// results.view { it.trim() }
+ results.view { it.trim() }
 
 // ~~~~~~~~~~~~~~~ PIPELINE COMPLETION EVENTS ~~~~~~~~~~~~~~~~~~~ //
 
