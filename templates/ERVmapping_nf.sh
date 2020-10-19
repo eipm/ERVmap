@@ -13,8 +13,6 @@ function usage() {
 
 MODE="!{mode}"
 OUT_PREFIX="!{outPrefix}"
-CPUS=!{cpus}
-LIMIT_RAM=!{limitMemory}
 _DEBUG="!{debug}"
 
 logMsg() {
@@ -32,8 +30,6 @@ logMsg() {
     fi
 } 
 
-if [ -z ${CPUS+x} ];then export CPUS=1;fi
-if [ -z ${LIMIT_RAM+x} ];then export LIMIT_RAM=35129075129;fi
 if [ -z ${MODE+x} ];then 
     usage
     logMsg "ERROR" "MODE not set."
@@ -44,29 +40,36 @@ if [ -z ${OUT_PREFIX+x} ];then
     logMsg "WARN" "This prefix will be used as output: $OUT_PREFIX"
 fi 
 
-logMsg "DEBUG" "CPUs:($CPUS)"
-logMsg "DEBUG" "Limit RAM:($LIMIT_RAM)"
 logMsg "DEBUG" "OUT_PREFIX:($OUT_PREFIX)"
 logMsg "DEBUG" "MODE:($MODE)"
 
 logMsg "INFO" "-------- START (mode: $MODE) ---------"
 
 if [[ "$MODE" == "STAR" || "$MODE" == "ALL" ]]; then
+    # initializing parameters for STAR
     READS="!{reads}"
+    CPUS=!{cpus}
+    LIMIT_RAM=!{limitMemory}
+
+    if [ -z ${CPUS+x} ];then export CPUS=1;fi
+    if [ -z ${LIMIT_RAM+x} ];then export LIMIT_RAM=35129075129;fi
+
     logMsg "DEBUG" "Reads: ($READS)"
+    logMsg "DEBUG" "CPUs:($CPUS)"
+    logMsg "DEBUG" "Limit RAM:($LIMIT_RAM)"
+    
     BAM="./results/$OUT_PREFIX""Aligned.sortedByCoord.out.bam"
+    
     if [[ ! -e "$BAM" ]];then
-    logMsg "INFO" "---- Alignment ----"
-    STAR --genomeDir /genome --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READS --readFilesCommand zcat --outFileNamePrefix ./results/$OUT_PREFIX
-    logMsg "INFO" "---- Alignment Complete ----"
-    if [[ ! -e  "$BAM" ]];then
-        logMsg "DEBUG" "PWD: $(pwd);$(ls -la ./)"
-        logMsg "DEBUG" "RESULTS: $(ls -l results)"
-        logMsg "ERROR" "BAM files not available:($BAM)"
-    fi
-    logMsg "INFO" "---- Indexing"
-    samtools index -@ $CPUS "$BAM"
-    logMsg "INFO" "---- Indexing Complete"
+        logMsg "INFO" "---- Alignment ----"
+        STAR --genomeDir /genome --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READS --readFilesCommand zcat --outFileNamePrefix ./results/$OUT_PREFIX
+        logMsg "INFO" "---- Alignment Complete ----"
+        if [[ ! -e  "$BAM" ]];then
+            logMsg "ERROR" "BAM files not available:($BAM)"
+        fi
+        logMsg "INFO" "---- Indexing"
+        samtools index -@ $CPUS "$BAM"
+        logMsg "INFO" "---- Indexing Complete"
     else
         # BAM file already exists, skipping
         logMsg "WARN" "BAM file already exists; skipping this step"
@@ -74,12 +77,13 @@ if [[ "$MODE" == "STAR" || "$MODE" == "ALL" ]]; then
 fi
 
 if [[ "$MODE" == "BED" || "$MODE" == "ALL" ]]; then
-    if [[ -z $BAM ]];then BAM="${bam}";fi
-    if [[ ! -e "$BAM" ]];then
-        logMsg "ERROR" "Cannot find BAM file: ( $BAM )"
+    BAM4BED="${bam}"
+    if [[ ! -z $BAM ]];then BAM4BED="$BAM";fi
+    if [[ ! -e "$BAM4BED" ]];then
+        logMsg "ERROR" "Cannot find BAM file: ( $BAM4BED )"
     fi
     logMsg "INFO" "---- Finding ERVs ----"
-    coverageBed -nonamecheck -a /resources/ERVmap.bed -b "data/$OUT_PREFIX""Aligned.sortedByCoord.out.bam" -counts -sorted > ./results/"$OUT_PREFIX""ERVresults.txt"
+    coverageBed -nonamecheck -a /resources/ERVmap.bed -b "$BAM4BED" -counts -sorted > ./results/"$OUT_PREFIX""ERVresults.txt" # data/$OUT_PREFIX""Aligned.sortedByCoord.out.bam
     logMsg "INFO" "---- Finding ERVs complete ----"
 fi
 
