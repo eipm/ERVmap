@@ -92,14 +92,15 @@ process ERVcounting {
     val(debug) from params.debug
 
     output: 
-    // stdout results
+    path ("./results/")
 
-//     shell:
-    """
-    echo 'BED' $mode 
-    ls -la ./
-    """
-//     //template 'ERVmapping_nf.sh'
+    // """
+    // echo 'BED' $mode 
+    // ls -la ./
+    // """
+
+    shell:
+    template 'ERVmapping_nf.sh'
 }
 
 // results.view { it.trim() }

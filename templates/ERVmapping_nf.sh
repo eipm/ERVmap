@@ -74,7 +74,7 @@ fi
 
 if [[ "$MODE" == "BED" || "$MODE" == "ALL" ]]; then
     logMsg "INFO" "---- Finding ERVs ----"
-    coverageBed -nonamecheck -a /resources/ERVmap.bed -b "$BAM" -counts -sorted > /results/"$OUT_PREFIX""ERVresults.txt"
+    coverageBed -nonamecheck -a /resources/ERVmap.bed -b "./data/$OUT_PREFIX""Aligned.sortedByCoord.out.bam" -counts -sorted > ./results/"$OUT_PREFIX""ERVresults.txt"
     logMsg "INFO" "---- Finding ERVs complete ----"
 fi
 
