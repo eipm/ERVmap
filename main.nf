@@ -37,7 +37,8 @@ process ERValign {
     errorStrategy 'terminate'
 
     input:
-    val(outPrefix) from params.outPrefix    
+    val(outPrefix) from params.outPrefix
+    val(localOutDir) from params.localOutDir
     val(cpus) from params.cpus
     val(limitMemory) from params.limitMemory
     val(debug) from params.debug
