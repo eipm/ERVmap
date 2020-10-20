@@ -1,6 +1,6 @@
 .DS_Store
 .vscode/
-results/
-tmp/
 .nextflow/
 work/
+results/
+tmp/

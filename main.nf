@@ -29,6 +29,9 @@
 if (!params.inputDir) {
     exit 1, "inputDir parameter is missing."
 }
+if (!params.outputDir) {
+    exit 1, "outputDir parameter is missing."
+}
 if ( !new File(params.inputDir).exists()) {
     exit 1, "The input folder does not exists."+params.inputDir+"\n"
 }
@@ -39,7 +42,8 @@ if (!params.debug) {
     exit 1, "Debug prefix parameter is missing."
 }
 pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 2, checkIfExists: true )
-results_ch = Channel.fromPath( "./results")
+bam_align_ch = Channel.fromPath( params.outputDir )
+bam_count_ch = Channel.fromPath( params.outputDir )
 
 process ERValign {
     // tag ${sample}
@@ -62,7 +66,7 @@ process ERValign {
     val(limitMemory) from params.limitMemory
     val(debug) from params.debug
     tuple val(sample), file(reads) from pairFiles_ch
-    path results from results_ch
+    path results from bam_align_ch
 
     output:
     path ( "results/${outPrefix}Aligned.sortedByCoord.out.bam" ) into star_bam_ch
@@ -87,20 +91,22 @@ process ERVcount {
     errorStrategy 'terminate'
     mode = 'BED'
     stageInMode 'symlink'
-    
+    publishDir 'results/nextflow'
+
     input:
     path (bam) from star_bam_ch
     val(outPrefix) from params.outPrefix
     val(debug) from params.debug
+    path bam from bam_count_ch
     
     output: 
-    path ("results/") into results
+    path ("results") into final_results_ch
 
     shell:
     template "ERVcount.sh"
 }
 
-results.subscribe { println }
+final_results_ch.subscribe { println "File: ${it.name}" }
 
 // ~~~~~~~~~~~~~~~ PIPELINE COMPLETION EVENTS ~~~~~~~~~~~~~~~~~~~ //
 

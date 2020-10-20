@@ -15,7 +15,7 @@ logMsg() {
         'DEBUG' | 'true' )
             if [ $_DEBUG == 'on' ];then printf "[%s]:\t[%s]\t%s\n" "$(date)" "$1" "$2";fi
             ;;
-        'INFO' | 'ERROR' ) 
+        'WARN' | 'INFO' | 'ERROR' ) 
             printf "[%s]:\t[%s]\t%s\n" "$(date)" "$1" "$2"
             ;;
     esac
@@ -25,7 +25,7 @@ logMsg() {
 } 
 
 function usage() {
-    echo "Usage: ERValign.sh <-r1|--read1> SAMPLE_1.fastq.gz <-r2|--read2> SAMPLE_1.fastq.gz [-o|--output] results/SAMPLE [-c|--cpus] Ncpus [-l|--limit-ram] 35129075129 [-d|--debug {off|on}]"
+    echo "Usage: ERValign.sh <-r1|--read1> SAMPLE_1.fastq.gz <-r2|--read2> SAMPLE_1.fastq.gz [-o|--output] results/SAMPLE [-c|--cpus] Ncpus [-l|--limit-ram] 35129075129 [-d|--debug {off|on}]\nA genome folder should be present in /genome"
 }
 
 # initializing parameters for STAR
@@ -45,20 +45,17 @@ if [ -z ${LIMIT_RAM+x} ];then export LIMIT_RAM=35129075129;fi
 [ -e "/genome/genomeParameters.txt" ] || logMsg "ERROR" "The indexed genome cannot be found. Check that it is present and you have read permissions."
 
 logMsg "DEBUG" "OUT_PREFIX:($OUT_PREFIX)"
-logMsg "DEBUG" "MODE:($MODE)"
-logMsg "DEBUG" "Reads: ($READS)"
+logMsg "DEBUG" "Reads: ($READS)"l
 logMsg "DEBUG" "CPUs:($CPUS)"
 logMsg "DEBUG" "Limit RAM:($LIMIT_RAM)"
 
 logMsg "INFO" "-------- START ERValign ---------"
 
-BAM="./results/$OUT_PREFIX""Aligned.sortedByCoord.out.bam"
-
-ls -la !{results}/$OUT_PREFIX""Aligned.sortedByCoord.out.bam 
+BAM="results/$OUT_PREFIX""Aligned.sortedByCoord.out.bam"
 
 if [[ ! -e "$BAM" ]];then
     logMsg "INFO" "---- Alignment ----"
-    STAR --genomeDir /genome --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READS --readFilesCommand zcat --outFileNamePrefix ./results/$OUT_PREFIX
+    STAR --genomeDir /genome --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READS --readFilesCommand zcat --outFileNamePrefix results/$OUT_PREFIX
     [ $? == 0 ] || logMsg  "ERROR" "The alignment didn't complete succesfully. Check the logs."
 
     logMsg "INFO" "---- Alignment Complete ----"
@@ -71,5 +68,6 @@ if [[ ! -e "$BAM" ]];then
 else
     # BAM file already exists, skipping
     logMsg "WARN" "BAM file already exists; skipping this step"
+    touch results/$RANDOM
 fi
 logMsg "INFO" "-------- END ERValign ---------"
