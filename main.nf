@@ -82,7 +82,7 @@ process ERVcount {
     path bam from bam_count_ready_ch.mix(bam_count_ch)
     
     output: 
-    path ("Andrea_"+params.outPrefix+"ERVresults.txt") into final_results_ch
+    path (params.outPrefix+"ERVresults.txt") into final_results_ch
 
     shell:
     template "ERVcount.sh"

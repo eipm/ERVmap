@@ -45,6 +45,5 @@ fi
 
 logMsg "INFO" "---- Finding ERVs ----"
 coverageBed -nonamecheck -a /resources/ERVmap.bed -b "$BAM" -counts -sorted > results/"$OUT_PREFIX""ERVresults.txt"
-# echo "These are the results" > "Andrea_$OUT_PREFIX""ERVresults.txt"
 logMsg "INFO" "---- Finding ERVs complete ----"
 logMsg "INFO" "-------- END ERVcount ---------"
