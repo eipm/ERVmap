@@ -35,11 +35,13 @@ if ( !new File(params.inputDir).exists()) {
 if (!params.outPrefix) {
     exit 1, "Output prefix parameter is missing."
 }
-
+if (!params.debug) {
+    exit 1, "Debug prefix parameter is missing."
+}
 pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 2, checkIfExists: true )
 results_ch = Channel.fromPath( "./results")
 
-process STARAlignment {
+process ERValign {
     // tag ${sample}
     
     // executor configuration
@@ -48,7 +50,7 @@ process STARAlignment {
     scratch true
     
     // other configuration
-    echo false
+    echo true
     errorStrategy 'terminate'
     
     mode='STAR'
@@ -60,6 +62,7 @@ process STARAlignment {
     val(limitMemory) from params.limitMemory
     val(debug) from params.debug
     tuple val(sample), file(reads) from pairFiles_ch
+    path results from results_ch
 
     output:
     path ( "results/${outPrefix}Aligned.sortedByCoord.out.bam" ) into star_bam_ch
@@ -68,10 +71,10 @@ process STARAlignment {
     // echo 'STAR:' "$mode - $sample - $reads"
     // """
     shell:
-    template 'ERVmapping_nf.sh'
+    template 'ERValign.sh'
 }
 
-process ERVcounting {
+process ERVcount {
 //     tag ${sample}
 
     // executor configuration
@@ -87,25 +90,17 @@ process ERVcounting {
     
     input:
     path (bam) from star_bam_ch
-    val(mode) from mode
     val(outPrefix) from params.outPrefix
     val(debug) from params.debug
-    val(cpus) from params.cpus
-    val(limitMemory) from params.limitMemory
     
     output: 
     path ("results/") into results
 
-    // """
-    // echo 'BED' $mode 
-    // ls -la ./
-    // """
-
     shell:
-    template "ERVmapping_nf.sh"
+    template "ERVcount.sh"
 }
 
- results.view { it.trim() }
+results.subscribe { println }
 
 // ~~~~~~~~~~~~~~~ PIPELINE COMPLETION EVENTS ~~~~~~~~~~~~~~~~~~~ //
 
