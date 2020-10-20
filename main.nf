@@ -18,14 +18,6 @@ if (!params.debug) {
     exit 1, "Debug prefix parameter is missing."
 }
 
-if ( new File( params.outputDir+"/"+params.outPrefix+"Aligned.sortedByCoord.out.bam").exists() ) {
-    params.performAlignment = false
-    bam_count_ready_ch = Channel.fromPath( params.outputDir+"/"+params.outPrefix+"Aligned.sortedByCoord.out.bam" )
-} else {
-    params.performAlignment = true
-    bam_count_ready_ch = Channel.empty()
-}
-
 pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 2, checkIfExists: true )
 
 process ERValign {
@@ -35,7 +27,8 @@ process ERValign {
     time '8h'
     // memory '35.GB'
     scratch true
-    
+    storeDir params.outputDir
+
     // other configuration
     echo true
     errorStrategy 'terminate'
@@ -48,14 +41,9 @@ process ERValign {
     tuple val(sample), file(reads) from pairFiles_ch
     
     output:
-    path ( "results/${outPrefix}Aligned.sortedByCoord.out.bam" ) into bam_count_ch
+    path ( "${outPrefix}Aligned.sortedByCoord.out.bam" ) into bam_ch
+    path ( "${outPrefix}Aligned.sortedByCoord.out.bam.bai" ) into bai_ch
 
-    when: 
-    params.performAlignment
-
-    // """
-    // echo 'STAR:' "$mode - $sample - $reads"
-    // """
     shell:
     template 'ERValign.sh'
 }
@@ -67,19 +55,19 @@ process ERVcount {
     time '3h'
     memory '8.GB'
     scratch true
+    storeDir params.outputDir
 
     // other configuration
     echo true
     errorStrategy 'terminate'
     mode = 'BED'
     stageInMode 'symlink'
-    stageOutMode 'move'
-    publishDir 'results/nextflow'
     
     input:
     val(outPrefix) from params.outPrefix
     val(debug) from params.debug
-    path bam from bam_count_ready_ch.mix(bam_count_ch)
+    path bam from bam_ch
+    path bai from bai_ch
     
     output: 
     path (params.outPrefix+"ERVresults.txt") into final_results_ch
