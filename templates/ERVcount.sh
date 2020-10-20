@@ -19,7 +19,7 @@ logMsg() {
         'DEBUG' | 'true' )
             if [ $_DEBUG == 'on' ];then printf "[%s]:\t[%s]\t%s\n" "$(date)" "$1" "$2";fi
             ;;
-        'INFO' | 'ERROR' ) 
+        'INFO' | 'WARN' | 'ERROR' ) 
             printf "[%s]:\t[%s]\t%s\n" "$(date)" "$1" "$2"
             ;;
     esac
@@ -43,6 +43,8 @@ if [[ ! -e "$BAM" ]];then
 fi
 
 logMsg "INFO" "---- Finding ERVs ----"
-coverageBed -nonamecheck -a /resources/ERVmap.bed -b "$BAM" -counts -sorted > results/"$OUT_PREFIX""ERVresults.txt" # data/$OUT_PREFIX""Aligned.sortedByCoord.out.bam
+# coverageBed -nonamecheck -a /resources/ERVmap.bed -b "$BAM" -counts -sorted > results/"$OUT_PREFIX""ERVresults.txt"
+mkdir results 
+echo "These are the results" > "Andrea_$OUT_PREFIX""ERVresults.txt"
 logMsg "INFO" "---- Finding ERVs complete ----"
 logMsg "INFO" "-------- END ERVcount ---------"

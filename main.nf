@@ -2,30 +2,6 @@
 
 
 // check parameters
-// if (!params.read1) {
-//     exit 1, "read1 parameter is missing."
-// }
-// if (!params.read2) {
-//     exit 1, "read2 parameter is missing."
-// }
-// if (!new File(params.read1).exists()) {
-//     exit 1, "The read1 file does not exists".params.read1."\n"
-// }
-// if (!new File(params.read2).exists()) {
-//     exit 1, "The read2 file does not exists.".params.read2."\n"
-// }
-// if (!params.genome) {
-//     exit 1, "genome parameter is missing."
-// }
-// if (!new File(params.genome).exists()) {
-//     exit 1, "The indexed genome does not exists.".params.genome."\n"
-// // }
-// if (!params.ervbed) {
-//     exit 1, "ERVbed parameter is missing."
-// }
-// if (!new File(params.ervbed).exists()) {
-//     exit 1, "The ERV bed file does not exists.".params.ervbed."\n"
-// }
 if (!params.inputDir) {
     exit 1, "inputDir parameter is missing."
 }
@@ -41,9 +17,15 @@ if (!params.outPrefix) {
 if (!params.debug) {
     exit 1, "Debug prefix parameter is missing."
 }
+
+if ( new File( params.outputDir+"/"+params.outPrefix+"Aligned.sortedByCoord.out.bam").exists() ) {
+    params.performAlignment = false
+    bam_count_ready_ch = Channel.fromPath( params.outputDir+"/"+params.outPrefix+"Aligned.sortedByCoord.out.bam" )
+} else {
+    params.performAlignment = true
+}
+
 pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 2, checkIfExists: true )
-bam_align_ch = Channel.fromPath( params.outputDir )
-bam_count_ch = Channel.fromPath( params.outputDir )
 
 process ERValign {
     // tag ${sample}
@@ -56,20 +38,19 @@ process ERValign {
     // other configuration
     echo true
     errorStrategy 'terminate'
-    
-    mode='STAR'
 
     input:
     val(outPrefix) from params.outPrefix    
-    val(mode) from mode
     val(cpus) from params.cpus
     val(limitMemory) from params.limitMemory
     val(debug) from params.debug
     tuple val(sample), file(reads) from pairFiles_ch
-    path results from bam_align_ch
-
+    
     output:
-    path ( "results/${outPrefix}Aligned.sortedByCoord.out.bam" ) into star_bam_ch
+    path ( "results/${outPrefix}Aligned.sortedByCoord.out.bam" ) into bam_count_ch
+
+    when: 
+    params.performAlignment
 
     // """
     // echo 'STAR:' "$mode - $sample - $reads"
@@ -83,7 +64,7 @@ process ERVcount {
 
     // executor configuration
     time '3h'
-//     memory '8.GB'
+    memory '8.GB'
     scratch true
 
     // other configuration
@@ -91,22 +72,20 @@ process ERVcount {
     errorStrategy 'terminate'
     mode = 'BED'
     stageInMode 'symlink'
+    stageOutMode 'move'
     publishDir 'results/nextflow'
-
+    
     input:
-    path (bam) from star_bam_ch
     val(outPrefix) from params.outPrefix
     val(debug) from params.debug
-    path bam from bam_count_ch
+    path bam from bam_count_ready_ch.mix(bam_count_ch)
     
     output: 
-    path ("results") into final_results_ch
+    path ("Andrea_"+params.outPrefix+"ERVresults.txt") into final_results_ch
 
     shell:
     template "ERVcount.sh"
 }
-
-final_results_ch.subscribe { println "File: ${it.name}" }
 
 // ~~~~~~~~~~~~~~~ PIPELINE COMPLETION EVENTS ~~~~~~~~~~~~~~~~~~~ //
 
