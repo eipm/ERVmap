@@ -33,6 +33,7 @@ if [ -z ${OUT_PREFIX+x} ];then
     OUT_PREFIX="$RANDOM""_"
     logMsg "WARN" "This prefix will be used as output: $OUT_PREFIX"
 fi 
+mkdir results 
 
 logMsg "DEBUG" "OUT_PREFIX:($OUT_PREFIX)"
 
@@ -43,8 +44,7 @@ if [[ ! -e "$BAM" ]];then
 fi
 
 logMsg "INFO" "---- Finding ERVs ----"
-# coverageBed -nonamecheck -a /resources/ERVmap.bed -b "$BAM" -counts -sorted > results/"$OUT_PREFIX""ERVresults.txt"
-mkdir results 
-echo "These are the results" > "Andrea_$OUT_PREFIX""ERVresults.txt"
+coverageBed -nonamecheck -a /resources/ERVmap.bed -b "$BAM" -counts -sorted > results/"$OUT_PREFIX""ERVresults.txt"
+# echo "These are the results" > "Andrea_$OUT_PREFIX""ERVresults.txt"
 logMsg "INFO" "---- Finding ERVs complete ----"
 logMsg "INFO" "-------- END ERVcount ---------"

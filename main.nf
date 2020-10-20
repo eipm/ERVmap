@@ -23,6 +23,7 @@ if ( new File( params.outputDir+"/"+params.outPrefix+"Aligned.sortedByCoord.out.
     bam_count_ready_ch = Channel.fromPath( params.outputDir+"/"+params.outPrefix+"Aligned.sortedByCoord.out.bam" )
 } else {
     params.performAlignment = true
+    bam_count_ready_ch = Channel.empty()
 }
 
 pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 2, checkIfExists: true )
