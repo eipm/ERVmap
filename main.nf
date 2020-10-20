@@ -17,6 +17,9 @@ if (!params.outPrefix) {
 if (!params.debug) {
     exit 1, "Debug prefix parameter is missing."
 }
+if (!params.localOutDir) {
+    params.localOutDir='bam'
+}
 
 pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 2, checkIfExists: true )
 
@@ -41,8 +44,8 @@ process ERValign {
     tuple val(sample), file(reads) from pairFiles_ch
     
     output:
-    path ( "${outPrefix}Aligned.sortedByCoord.out.bam" ) into bam_ch
-    path ( "${outPrefix}Aligned.sortedByCoord.out.bam.bai" ) into bai_ch
+    path ( "${localOutDir}/${outPrefix}Aligned.sortedByCoord.out.bam" ) into bam_ch
+    path ( "${localOutDir}/${outPrefix}Aligned.sortedByCoord.out.bam.bai" ) into bai_ch
 
     shell:
     template 'ERValign.sh'
