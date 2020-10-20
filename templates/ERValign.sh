@@ -33,7 +33,7 @@ READS="!{reads}"
 CPUS=!{cpus}
 LIMIT_RAM=!{limitMemory}
 OUT_PREFIX="!{outPrefix}"
-LOCAL_OUTDIR="bam"
+LOCAL_OUTDIR="!{localOutDir}"
 
 # checking the prefix of the output BAM
 if [ -z ${OUT_PREFIX+x} ];then
