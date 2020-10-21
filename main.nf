@@ -24,12 +24,13 @@ if (!params.localOutDir) {
 pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 2, checkIfExists: true )
 
 process ERValign {
-    // tag ${sample}
+    tag !{sample}
     
     // executor configuration
     time '8h'
     // memory '35.GB'
     scratch true
+    cpus params.cpus
     storeDir params.outputDir
 
     // other configuration
@@ -39,7 +40,7 @@ process ERValign {
     input:
     val(outPrefix) from params.outPrefix
     val(localOutDir) from params.localOutDir
-    val(cpus) from params.cpus
+    // val(cpus) from params.cpus
     val(limitMemory) from params.limitMemory
     val(debug) from params.debug
     tuple val(sample), file(reads) from pairFiles_ch
@@ -53,7 +54,7 @@ process ERValign {
 }
 
 process ERVcount {
-//     tag ${sample}
+    tag !{sample}
 
     // executor configuration
     time '3h'
@@ -70,8 +71,8 @@ process ERVcount {
     input:
     val(outPrefix) from params.outPrefix
     val(debug) from params.debug
-    path bam from bam_ch
-    path bai from bai_ch
+    path (bam) from bam_ch
+    path (bai) from bai_ch
     
     output: 
     path (params.outPrefix+"ERVresults.txt") into final_results_ch

@@ -33,7 +33,6 @@ if [ -z ${OUT_PREFIX+x} ];then
     OUT_PREFIX="$RANDOM""_"
     logMsg "WARN" "This prefix will be used as output: $OUT_PREFIX"
 fi 
-mkdir results 
 
 logMsg "DEBUG" "OUT_PREFIX:($OUT_PREFIX)"
 

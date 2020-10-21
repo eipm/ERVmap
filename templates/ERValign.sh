@@ -30,7 +30,7 @@ function usage() {
 
 # initializing parameters for STAR
 READS="!{reads}"
-CPUS=!{cpus}
+CPUS=!{task.cpus}
 LIMIT_RAM=!{limitMemory}
 OUT_PREFIX="!{outPrefix}"
 LOCAL_OUTDIR="!{localOutDir}"
