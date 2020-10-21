@@ -1,6 +1,6 @@
 .DS_Store
-*fastq.gz
-*fastq
+.vscode/
+.nextflow/
+work/
 results/
-data/
 tmp/
