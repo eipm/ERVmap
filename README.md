@@ -66,6 +66,24 @@ There are also other parameters from Docker that should be included before `ervm
     --memory-swap 100G
 ``` 
 
+# Nextflow version
+
+To run this pipeline using [Nextflow](https://www.nextflow.io/), simply run the following:
+`nextflow -C nextflow.config  run main.nf`
+where `nextflow.config` include the minimum set of parameters to run ERVmap within the docker container. Specifically:
+```
+params {
+    inputDir='' # external path of the input data
+    outputDir='' # external path of the output results
+    localOutDir='' # internal path of the results
+    outPrefix='test.' # [optional] it defines the prefix for the results
+    cpus=1 # Number of cpus/threads to use for the alignment          
+    limitMemory=32000000 # memory limit for samtools
+    debug='off' # either [on|off] 
+}
+```
+**NOTE**: another critical parameter is the location of the indexed genome. This information must be included in the config as `containerOptions = '--memory 35G --memory-swap 100G -v /path/to/genome:/genome:ro'` (replace `/path/to/genome` with the external location of the genome)
+
 ----
 
 # Published version 
