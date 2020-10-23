@@ -3,23 +3,31 @@
 
 // check parameters
 if (!params.inputDir) {
-    exit 1, "inputDir parameter is missing."
-}
-if (!params.outputDir) {
-    exit 1, "outputDir parameter is missing."
+    exit 1, 'inputDir parameter is missing.'
 }
 if ( !new File(params.inputDir).exists()) {
     exit 1, "The input folder does not exists."+params.inputDir+"\n"
 }
+if (!params.outputDir) {
+    exit 1, "outputDir parameter is missing."
+}
+if (!params.starTmpDir) {
+    exit 1, "starTmpDir parameter is missing."
+}
+
+if ( !new File(params.starTmpDir).exists()) {
+    exit 1, 'The STAR temporary folder does not exists. ('+params.starTmpDir+')\n'
+}
 if (!params.outPrefix) {
     exit 1, "Output prefix parameter is missing."
-}
-if (!params.debug) {
-    exit 1, "Debug prefix parameter is missing."
 }
 if (!params.localOutDir) {
     params.localOutDir='bam'
 }
+if (!params.debug) {
+    exit 1, "Debug prefix parameter is missing."
+}
+
 
 pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 2, checkIfExists: true )
 

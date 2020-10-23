@@ -71,8 +71,8 @@ COPY --from=bioinformatics_base ${star_dir}/source/STAR ${star_dir}/source/STAR
 #===========================#
 # Installing tools          #
 #===========================#
-RUN mkdir -p /scripts /resources /results
-RUN chmod ugo+wx /results
+RUN mkdir -p /scripts /resources /results /STAR_tmp
+RUN chmod ugo+wx /results /STAR_tmp
 COPY ERVmapping.sh /scripts
 COPY templates/ERValign.sh /scripts
 COPY templates/ERVcount.sh /scripts
