@@ -51,7 +51,7 @@ logMsg "INFO" "-------- START ERValign ---------"
 BAM="$LOCAL_OUTDIR/$OUT_PREFIX""Aligned.sortedByCoord.out.bam"
 
 logMsg "INFO" "---- Alignment ----"
-STAR --genomeDir /genome --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READS --readFilesCommand zcat --outFileNamePrefix $LOCAL_OUTDIR/$OUT_PREFIX --outTmpDir /STAR_tmp
+STAR --genomeDir /genome --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READS --readFilesCommand zcat --outFileNamePrefix $LOCAL_OUTDIR/$OUT_PREFIX --outTmpDir /STAR_tmp/$OUT_PREFIX""tmp
 [ $? == 0 ] || logMsg  "ERROR" "The alignment didn't complete succesfully. Check the logs."
 
 logMsg "INFO" "---- Alignment Complete ----"
