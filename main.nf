@@ -18,9 +18,6 @@ if (!params.starTmpDir) {
 if ( !new File(params.starTmpDir).exists()) {
     exit 1, 'The STAR temporary folder does not exists. ('+params.starTmpDir+')\n'
 }
-if (!params.outPrefix) {
-    exit 1, "Output prefix parameter is missing."
-}
 if (!params.localOutDir) {
     params.localOutDir='bam'
 }
@@ -53,8 +50,8 @@ process ERValign {
     val(debug) from params.debug
     
     output:
-    path ( "${localOutDir}/${outPrefix}Aligned.sortedByCoord.out.bam" ) into bam_ch
-    path ( "${localOutDir}/${outPrefix}Aligned.sortedByCoord.out.bam.bai" ) into bai_ch
+    path ( "${localOutDir}/${sample}.Aligned.sortedByCoord.out.bam" ) into bam_ch
+    path ( "${localOutDir}/${sample}.Aligned.sortedByCoord.out.bam.bai" ) into bai_ch
     val "${sample}" into prefix_ch
 
     shell:
@@ -83,7 +80,7 @@ process ERVcount {
     path (bai) from bai_ch
     
     output: 
-    path (params.outPrefix+'ERVresults.txt') into final_results_ch
+    path ( "${outPrefix}"+'.ERVresults.txt') into final_results_ch
 
     shell:
     template "ERVcount.sh"
