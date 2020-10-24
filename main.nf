@@ -70,7 +70,6 @@ process ERVcount {
     // other configuration
     echo true
     errorStrategy 'terminate'
-    mode = 'BED'
     stageInMode 'symlink'
     
     input:
