@@ -75,14 +75,15 @@ To run this pipeline using [Nextflow](https://www.nextflow.io/), simply run the 
 where `nextflow.config` include the minimum set of parameters to run ERVmap within the docker container. Specifically:
 ```
 params {
-    genome='/path/to/genome' # external path to the indexed genome for the STAR aligner
-    inputDir='path/to/input/folder' # external path of the input data
-    outputDir='/path/to/output/folder' # external path of the output results
+    genome='/path/to/genome'               # external path to the indexed genome for the STAR aligner
+    inputDir='path/to/input/folder'        # external path of the input data
+    inputPattern="*{1,2}.fastq.gz"         # pattern to search for input FASTQ files
+    outputDir='/path/to/output/folder'     # external path of the output results
     starTmpDir='/path/to/STAR/temp/folder' # external path of the STAR aligner temporary folder. REQUIRED
-    localOutDir='.' # internal path of the results
-    cpus=20 # Number of cpus/threads to use for the alignment 
-    limitMemory=1850861158 # memory limit for STAR
-    debug='off' # either [on|off] 
+    localOutDir='.'                        # internal path of the results
+    cpus=20                                # Number of cpus/threads to use for the alignment 
+    limitMemory=1850861158                 # memory limit for STAR
+    debug='off'                            # either [on|off] 
 }
 ```
 **NOTE:** Adjust the memory settings of the docker container if needed, but recall that STAR requires about 32G of RAM (see [Optional Parameters](#optparam)).

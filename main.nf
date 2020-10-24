@@ -26,7 +26,7 @@ if (!params.debug) {
 }
 
 
-pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 2, checkIfExists: true )
+pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/"+params.inputPattern, size: 2, checkIfExists: true )
 
 
 process ERValign {
