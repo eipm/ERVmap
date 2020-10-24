@@ -73,13 +73,13 @@ process ERVcount {
     stageInMode 'symlink'
     
     input:
-    val (outPrefix) from prefix_ch
+    val (sample) from prefix_ch
     val(debug) from params.debug
     path (bam) from bam_ch
     path (bai) from bai_ch
     
     output: 
-    path ( "${outPrefix}"+'.ERVresults.txt') into final_results_ch
+    path ( "${sample}"+'.ERVresults.txt') into final_results_ch
 
     shell:
     template "ERVcount.sh"

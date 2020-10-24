@@ -24,7 +24,7 @@ logMsg() {
     fi
 }  
 
-OUT_PREFIX="!{outPrefix}."
+OUT_PREFIX="!{sample}."
 if [ -z ${OUT_PREFIX+x} ];then
     OUT_PREFIX="$RANDOM""_"
     logMsg "WARN" "This prefix will be used as output: $OUT_PREFIX"
