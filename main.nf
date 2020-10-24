@@ -34,7 +34,7 @@ process ERValign {
     
     // executor configuration
     time '8h'
-    // memory '35.GB'
+    memory '35.GB'
     scratch true
     cpus params.cpus
     publishDir params.outputDir
