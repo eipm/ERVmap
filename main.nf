@@ -31,6 +31,7 @@ if (!params.debug) {
 
 pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 2, checkIfExists: true )
 
+
 process ERValign {
     tag "${sample}"
     
@@ -39,22 +40,22 @@ process ERValign {
     // memory '35.GB'
     scratch true
     cpus params.cpus
-    storeDir params.outputDir
+    publishDir params.outputDir
 
     // other configuration
     echo true
     errorStrategy 'terminate'
 
     input:
-    val(outPrefix) from params.outPrefix
+    tuple val(sample), file(reads) from pairFiles_ch
     val(localOutDir) from params.localOutDir
     val(limitMemory) from params.limitMemory
     val(debug) from params.debug
-    tuple val(sample), file(reads) from pairFiles_ch
     
     output:
     path ( "${localOutDir}/${outPrefix}Aligned.sortedByCoord.out.bam" ) into bam_ch
     path ( "${localOutDir}/${outPrefix}Aligned.sortedByCoord.out.bam.bai" ) into bai_ch
+    val "${sample}" into prefix_ch
 
     shell:
     template 'ERValign.sh'
@@ -76,7 +77,7 @@ process ERVcount {
     stageInMode 'symlink'
     
     input:
-    val(outPrefix) from params.outPrefix
+    val (outPrefix) from prefix_ch
     val(debug) from params.debug
     path (bam) from bam_ch
     path (bai) from bai_ch

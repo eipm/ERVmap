@@ -28,7 +28,7 @@ logMsg() {
 READS="!{reads}"
 CPUS=!{task.cpus}
 LIMIT_RAM=!{limitMemory}
-OUT_PREFIX="!{outPrefix}"
+OUT_PREFIX="!{sample}."
 LOCAL_OUTDIR="!{localOutDir}"
 
 # checking the prefix of the output BAM
@@ -42,6 +42,7 @@ if [ -z ${LIMIT_RAM+x} ];then export LIMIT_RAM=35129075129;fi
 [ -e "/genome/genomeParameters.txt" ] || logMsg "ERROR" "The indexed genome cannot be found. Check that it is present and you have read permissions."
 
 logMsg "DEBUG" "OUT_PREFIX:($OUT_PREFIX)"
+logMsg "DEBUG" "Local OutDir: $(pwd)/$LOCAL_OUTDIR"
 logMsg "DEBUG" "Reads: ($READS)"l
 logMsg "DEBUG" "CPUs:($CPUS)"
 logMsg "DEBUG" "Limit RAM:($LIMIT_RAM)"
