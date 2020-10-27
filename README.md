@@ -68,8 +68,7 @@ This option can only have 3 values: { `ALL`, `STAR`, `BED` }:
 * `STAR` to only perform the alignment;
 * `BED` to only run the ERV quantification.
 
-### Optional parameters (recommended)
-
+### <a id='optparam'></a>Optional parameters (*recommended*) 
 There are a few parameters that can be added to the ERVmap image to make the process more efficient.
 
 * `--cpus 20`: if you have a multi-core system (and you should have one), you can specify the number of CPUs to use (e.g. 20);
@@ -86,22 +85,25 @@ There are also other parameters from Docker that should be included before `ervm
 ## Nextflow version
 
 To run this pipeline using [Nextflow](https://www.nextflow.io/), simply run the following:
-`nextflow -C nextflow.config  run main.nf`
+`nextflow -C nextflow.config run main.nf`
 where `nextflow.config` include the minimum set of parameters to run ERVmap within the docker container. Specifically:
 
 ```bash
 params {
-    inputDir='' # external path of the input data
-    outputDir='' # external path of the output results
-    localOutDir='' # internal path of the results
-    outPrefix='test.' # [optional] it defines the prefix for the results
-    cpus=1 # Number of cpus/threads to use for the alignment
-    limitMemory=32000000 # memory limit for samtools
-    debug='off' # either [on|off]
+    genome='/path/to/genome'               # external path to the indexed genome for the STAR aligner
+    inputDir='path/to/input/folder'        # external path of the input data
+    inputPattern="*{1,2}.fastq.gz"         # pattern to search for input FASTQ files
+    outputDir='/path/to/output/folder'     # external path of the output results
+    starTmpDir='/path/to/STAR/temp/folder' # external path of the STAR aligner temporary folder. REQUIRED
+    localOutDir='.'                        # internal path of the results
+    cpus=20                                # Number of cpus/threads to use for the alignment 
+    limitMemory=1850861158                 # memory limit for STAR
+    debug='off'                            # either [on|off] 
 }
 ```
+**NOTE:** Adjust the memory settings of the docker container if needed, but recall that STAR requires about 32G of RAM (see [Optional Parameters](#optparam)).
 
-**NOTE**: another critical parameter is the location of the indexed genome. This information must be included in the config as `containerOptions = '--memory 35G --memory-swap 100G -v /path/to/genome:/genome:ro'` (replace `/path/to/genome` with the external location of the genome)
+**NOTE:** If you need to keep the BAM files generated, please make sure to make a copy. By default, the BAMs remains in the nextflow `work` folder and only symbolic links are available in `outputDir`. By cleaning up the `work` folder, e.g. by running `nextflow clean`, the bam files will be removed. The ERVmap results are copied into `outputDir` and thus are permanent.
 
 ----
 

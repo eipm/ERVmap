@@ -3,50 +3,56 @@
 
 // check parameters
 if (!params.inputDir) {
-    exit 1, "inputDir parameter is missing."
+    exit 1, 'inputDir parameter is missing.'
+}
+if (!new File(params.inputDir).exists()) {
+    exit 1, "The input folder does not exists."+params.inputDir+"\n"
 }
 if (!params.outputDir) {
     exit 1, "outputDir parameter is missing."
 }
-if ( !new File(params.inputDir).exists()) {
-    exit 1, "The input folder does not exists."+params.inputDir+"\n"
+if (!params.starTmpDir) {
+    exit 1, "starTmpDir parameter is missing."
 }
-if (!params.outPrefix) {
-    exit 1, "Output prefix parameter is missing."
+
+if (!new File(params.starTmpDir).exists()) {
+    exit 1, 'The STAR temporary folder does not exists. ('+params.starTmpDir+')\n'
+}
+if (!params.localOutputDir) {
+    params.localOutputDir='bam'
 }
 if (!params.debug) {
     exit 1, "Debug prefix parameter is missing."
 }
-if (!params.localOutDir) {
-    params.localOutDir='bam'
-}
 
-pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/*{1,2}.fastq.gz", size: 2, checkIfExists: true )
+
+pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/"+params.inputPattern, size: 2, checkIfExists: true )
+
 
 process ERValign {
     tag "${sample}"
     
     // executor configuration
     time '8h'
-    // memory '35.GB'
+    memory '35 GB'
     scratch true
     cpus params.cpus
-    storeDir params.outputDir
+    publishDir params.outputDir
 
     // other configuration
     echo true
     errorStrategy 'terminate'
 
     input:
-    val(outPrefix) from params.outPrefix
-    val(localOutDir) from params.localOutDir
-    val(limitMemory) from params.limitMemory
-    val(debug) from params.debug
-    tuple val(sample), file(reads) from pairFiles_ch
+    tuple val(sample), file (reads) from pairFiles_ch
+    val (localOutputDir) from params.localOutputDir
+    val (limitMemory) from params.limitMemory
+    val (debug) from params.debug
     
     output:
-    path ( "${localOutDir}/${outPrefix}Aligned.sortedByCoord.out.bam" ) into bam_ch
-    path ( "${localOutDir}/${outPrefix}Aligned.sortedByCoord.out.bam.bai" ) into bai_ch
+    path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam") into bam_ch
+    path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam.bai") into bai_ch
+    val (sample) into prefix_ch
 
     shell:
     template 'ERValign.sh'
@@ -64,20 +70,19 @@ process ERVcount {
     // other configuration
     echo true
     errorStrategy 'terminate'
-    mode = 'BED'
     stageInMode 'symlink'
     
     input:
-    val(outPrefix) from params.outPrefix
-    val(debug) from params.debug
+    val (sample) from prefix_ch
+    val (debug) from params.debug
     path (bam) from bam_ch
     path (bai) from bai_ch
     
     output: 
-    path (params.outPrefix+'ERVresults.txt') into final_results_ch
+    path ("${sample}"+'.ERVresults.txt') into final_results_ch
 
     shell:
-    template "ERVcount.sh"
+    template 'ERVcount.sh'
 }
 
 // ~~~~~~~~~~~~~~~ PIPELINE COMPLETION EVENTS ~~~~~~~~~~~~~~~~~~~ //

@@ -1,9 +1,5 @@
 #!/bin/bash
 
-function usage() {
-    echo "Usage: ERVcount.sh <-b|--bam> Aligned.bam [-o|--output] results/SAMPLE [-d|--debug {off|on}]"
-}
-
 BAM="!{bam}"
 _DEBUG="!{debug}"
 
@@ -28,7 +24,7 @@ logMsg() {
     fi
 }  
 
-OUT_PREFIX=!{outPrefix}
+OUT_PREFIX="!{sample}."
 if [ -z ${OUT_PREFIX+x} ];then
     OUT_PREFIX="$RANDOM""_"
     logMsg "WARN" "This prefix will be used as output: $OUT_PREFIX"

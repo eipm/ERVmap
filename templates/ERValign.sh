@@ -24,16 +24,12 @@ logMsg() {
     fi
 } 
 
-function usage() {
-    echo "Usage: ERValign.sh <-r1|--read1> SAMPLE_1.fastq.gz <-r2|--read2> SAMPLE_1.fastq.gz [-o|--output] results/SAMPLE [-c|--cpus] Ncpus [-l|--limit-ram] 35129075129 [-d|--debug {off|on}]\nA genome folder should be present in /genome"
-}
-
 # initializing parameters for STAR
 READS="!{reads}"
 CPUS=!{task.cpus}
 LIMIT_RAM=!{limitMemory}
-OUT_PREFIX="!{outPrefix}"
-LOCAL_OUTDIR="!{localOutDir}"
+OUT_PREFIX="!{sample}."
+LOCAL_OUTDIR="!{localOutputDir}"
 
 # checking the prefix of the output BAM
 if [ -z ${OUT_PREFIX+x} ];then
@@ -46,7 +42,8 @@ if [ -z ${LIMIT_RAM+x} ];then export LIMIT_RAM=35129075129;fi
 [ -e "/genome/genomeParameters.txt" ] || logMsg "ERROR" "The indexed genome cannot be found. Check that it is present and you have read permissions."
 
 logMsg "DEBUG" "OUT_PREFIX:($OUT_PREFIX)"
-logMsg "DEBUG" "Reads: ($READS)"l
+logMsg "DEBUG" "Local OutDir: $(pwd)/$LOCAL_OUTDIR"
+logMsg "DEBUG" "Reads: ($READS)"
 logMsg "DEBUG" "CPUs:($CPUS)"
 logMsg "DEBUG" "Limit RAM:($LIMIT_RAM)"
 
@@ -55,7 +52,7 @@ logMsg "INFO" "-------- START ERValign ---------"
 BAM="$LOCAL_OUTDIR/$OUT_PREFIX""Aligned.sortedByCoord.out.bam"
 
 logMsg "INFO" "---- Alignment ----"
-STAR --genomeDir /genome --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READS --readFilesCommand zcat --outFileNamePrefix $LOCAL_OUTDIR/$OUT_PREFIX
+STAR --genomeDir /genome --runThreadN $CPUS --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM $LIMIT_RAM --outFilterMultimapNmax 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.02 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --readFilesIn $READS --readFilesCommand zcat --outFileNamePrefix $LOCAL_OUTDIR/$OUT_PREFIX --outTmpDir /STAR_tmp/$OUT_PREFIX""tmp
 [ $? == 0 ] || logMsg  "ERROR" "The alignment didn't complete succesfully. Check the logs."
 
 logMsg "INFO" "---- Alignment Complete ----"
