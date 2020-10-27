@@ -1,14 +1,14 @@
-FROM ubuntu:latest as bioinformatics_base
+FROM ubuntu:20.04 as bioinformatics_base
 
 #===============================#
 # Docker Image Configuration	#
 #===============================#
-LABEL vendor="Englander Institute for Precision Medicine" \
-		description="ERVmap" \
-		maintainer="ans2077@med.cornell.edu" \
-		base_image="ubuntu" \
-		base_image_version="latest" \
-    	base_image_SHA256="sha256:fc04b2781f41f76c5b126ec26c0c0c26c7fc047318347a2112856253a88bb01d"
+LABEL org.opencontainers.image.source='https://github.com/eipm/ERVmap' \
+	vendor="Englander Institute for Precision Medicine" \
+	description="ERVmap" \
+	maintainer="ans2077@med.cornell.edu" \
+	base_image="ubuntu" \
+	base_image_version="20.04"
 
 ENV APP_NAME="ERVmap" \
 	TZ='US/Eastern' \
@@ -19,7 +19,7 @@ RUN apt-get update \
 	&& apt-get upgrade -y --fix-missing \
 	&& apt-get install build-essential -y \
 	&& apt-get install -y \
- 	vim \
+	vim \
 	emacs \
 	bedtools \
 	wget \
@@ -57,7 +57,6 @@ RUN wget -O STAR-${STAR_VERSION}.tar.gz https://github.com/alexdobin/STAR/archiv
 	&& cd ${star_dir}/source \
 	&& make STAR 
 RUN ln -s ${star_dir}/source/STAR /usr/local/bin/
-
 
 #===========================#
 # Production layer          #
