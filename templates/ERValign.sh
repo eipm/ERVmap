@@ -43,7 +43,7 @@ if [ -z ${LIMIT_RAM+x} ];then export LIMIT_RAM=35129075129;fi
 
 logMsg "DEBUG" "OUT_PREFIX:($OUT_PREFIX)"
 logMsg "DEBUG" "Local OutDir: $(pwd)/$LOCAL_OUTDIR"
-logMsg "DEBUG" "Reads: ($READS)"l
+logMsg "DEBUG" "Reads: ($READS)"
 logMsg "DEBUG" "CPUs:($CPUS)"
 logMsg "DEBUG" "Limit RAM:($LIMIT_RAM)"
 
