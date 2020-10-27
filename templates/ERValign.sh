@@ -29,7 +29,7 @@ READS="!{reads}"
 CPUS=!{task.cpus}
 LIMIT_RAM=!{limitMemory}
 OUT_PREFIX="!{sample}."
-LOCAL_OUTDIR="!{localOutDir}"
+LOCAL_OUTDIR="!{localOutputDir}"
 
 # checking the prefix of the output BAM
 if [ -z ${OUT_PREFIX+x} ];then

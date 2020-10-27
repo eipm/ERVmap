@@ -5,7 +5,7 @@
 if (!params.inputDir) {
     exit 1, 'inputDir parameter is missing.'
 }
-if ( !new File(params.inputDir).exists()) {
+if (!new File(params.inputDir).exists()) {
     exit 1, "The input folder does not exists."+params.inputDir+"\n"
 }
 if (!params.outputDir) {
@@ -15,11 +15,11 @@ if (!params.starTmpDir) {
     exit 1, "starTmpDir parameter is missing."
 }
 
-if ( !new File(params.starTmpDir).exists()) {
+if (!new File(params.starTmpDir).exists()) {
     exit 1, 'The STAR temporary folder does not exists. ('+params.starTmpDir+')\n'
 }
-if (!params.localOutDir) {
-    params.localOutDir='bam'
+if (!params.localOutputDir) {
+    params.localOutputDir='bam'
 }
 if (!params.debug) {
     exit 1, "Debug prefix parameter is missing."
@@ -34,7 +34,7 @@ process ERValign {
     
     // executor configuration
     time '8h'
-    memory '35.GB'
+    memory '35 GB'
     scratch true
     cpus params.cpus
     publishDir params.outputDir
@@ -44,15 +44,15 @@ process ERValign {
     errorStrategy 'terminate'
 
     input:
-    tuple val(sample), file(reads) from pairFiles_ch
-    val(localOutDir) from params.localOutDir
-    val(limitMemory) from params.limitMemory
-    val(debug) from params.debug
+    tuple val(sample), file (reads) from pairFiles_ch
+    val (localOutputDir) from params.localOutputDir
+    val (limitMemory) from params.limitMemory
+    val (debug) from params.debug
     
     output:
-    path ( "${localOutDir}/${sample}.Aligned.sortedByCoord.out.bam" ) into bam_ch
-    path ( "${localOutDir}/${sample}.Aligned.sortedByCoord.out.bam.bai" ) into bai_ch
-    val "${sample}" into prefix_ch
+    path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam") into bam_ch
+    path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam.bai") into bai_ch
+    val (sample) into prefix_ch
 
     shell:
     template 'ERValign.sh'
@@ -74,15 +74,15 @@ process ERVcount {
     
     input:
     val (sample) from prefix_ch
-    val(debug) from params.debug
+    val (debug) from params.debug
     path (bam) from bam_ch
     path (bai) from bai_ch
     
     output: 
-    path ( "${sample}"+'.ERVresults.txt') into final_results_ch
+    path ("${sample}"+'.ERVresults.txt') into final_results_ch
 
     shell:
-    template "ERVcount.sh"
+    template 'ERVcount.sh'
 }
 
 // ~~~~~~~~~~~~~~~ PIPELINE COMPLETION EVENTS ~~~~~~~~~~~~~~~~~~~ //
