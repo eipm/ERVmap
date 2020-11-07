@@ -2,7 +2,7 @@
 
 ERVmap is one part curated database of human proviral ERV loci and one part a stringent algorithm to determine which ERVs are transcribed in their RNA seq data.
 
-[![Actions Status](https://github.com/eipm/ERVmap/workflows/Docker/badge.svg)](https://github.com/eipm/ERVmap/actions) [![Github](https://img.shields.io/badge/github-latest-green?style=flat&logo=github)](https://github.com/eipm/ERVmap) [![Docker Hub](https://img.shields.io/badge/docker%20hub-latest-blue?style=flat&logo=docker)](https://hub.docker.com/repository/docker/eipm/ervmap) [![GitHub Container Registry](https://img.shields.io/badge/GitHub%20Container%20Registry-latest-blue?style=flat&logo=docker)](https://github.com/orgs/eipm/packages/container/package/ervmap)
+[![Actions Status](https://github.com/eipm/ERVmap/workflows/Docker/badge.svg)](https://github.com/eipm/ERVmap/actions) [![Github](https://img.shields.io/badge/github-latest-green?style=flat&logo=github)](https://github.com/eipm/ERVmap) [![EIPM Docker Hub](https://img.shields.io/badge/EIPM%20docker%20hub-latest-blue?style=flat&logo=docker)](https://hub.docker.com/repository/docker/eipm/ervmap) [![GitHub Container Registry](https://img.shields.io/badge/GitHub%20Container%20Registry-latest-blue?style=flat&logo=docker)](https://github.com/orgs/eipm/packages/container/package/ervmap)
 
 ## Citation
 
