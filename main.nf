@@ -5,6 +5,9 @@
 if (!params.inputDir) {
     exit 1, 'inputDir parameter is missing.'
 }
+if (!params.skipAlignment) {
+    params.skipAlignment=false
+}
 if (!new File(params.inputDir).exists()) {
     exit 1, "The input folder does not exists."+params.inputDir+"\n"
 }
@@ -25,9 +28,10 @@ if (!params.debug) {
     exit 1, "Debug prefix parameter is missing."
 }
 
-
-pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/"+params.inputPattern, size: 2, checkIfExists: true )
-
+// Adding the option to skip the alignment if skipAlignment is set to true.
+(pairFiles_ch, bam_ch, bai_ch) = ( params.skipAlignment
+                 ? [Channel.empty(), Channel.fromPath( params.inputDir+'/*bam'), Channel.fromPath(arams.inputDir+'/*bai') ]
+                 : [Channel.fromFilePairs( params.inputDir+'/'+params.inputPattern, size: 2, checkIfExists: true ), Channel.empty(), Channel.empty() ] )
 
 process ERValign {
     tag "${sample}"
