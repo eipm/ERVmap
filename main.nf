@@ -54,8 +54,8 @@ process ERValign {
     val (debug) from params.debug
     
     output:
-    path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam") into bam_ch
-    path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam.bai") into bai_ch
+    path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam") into star_bam_ch  
+    path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam.bai") into star_bai_ch
     val (sample) into prefix_ch
 
     shell:
@@ -79,8 +79,8 @@ process ERVcount {
     input:
     val (sample) from prefix_ch
     val (debug) from params.debug
-    path (bam) from bam_ch
-    path (bai) from bai_ch
+    path (bam) from bam_ch.mix( star_bam_ch ) // mixing with the channel from ERValign if started from FASTQs and skipAlignment=false
+    path (bai) from bai_ch.mix( star_bai_ch)  // mixing with the channel from ERValign if started from FASTQs and skipAlignment=false
     
     output: 
     path ("${sample}"+'.ERVresults.txt') into final_results_ch
