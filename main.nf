@@ -30,7 +30,7 @@ if (!params.debug) {
 
 // Adding the option to skip the alignment if skipAlignment is set to true.
 (pairFiles_ch, bam_ch, bai_ch) = ( params.skipAlignment
-                 ? [Channel.empty(), Channel.fromPath( params.inputDir+'/*bam'), Channel.fromPath(arams.inputDir+'/*bai') ]
+                 ? [Channel.empty(), Channel.fromPath( params.inputDir+'/*bam'), Channel.fromPath(params.inputDir+'/*bai') ]
                  : [Channel.fromFilePairs( params.inputDir+'/'+params.inputPattern, size: 2, checkIfExists: true ), Channel.empty(), Channel.empty() ] )
 
 process ERValign {
