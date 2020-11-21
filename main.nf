@@ -5,6 +5,9 @@
 if (!params.inputDir) {
     exit 1, 'inputDir parameter is missing.'
 }
+if (!params.skipAlignment) {
+    params.skipAlignment=false
+}
 if (!new File(params.inputDir).exists()) {
     exit 1, "The input folder does not exists."+params.inputDir+"\n"
 }
@@ -25,9 +28,10 @@ if (!params.debug) {
     exit 1, "Debug prefix parameter is missing."
 }
 
-
-pairFiles_ch = Channel.fromFilePairs( params.inputDir+"/"+params.inputPattern, size: 2, checkIfExists: true )
-
+// Adding the option to skip the alignment if skipAlignment is set to true.
+(fastqPairs_ch, bamPairs_ch) = (params.skipAlignment
+                 ? [Channel.empty(), Channel.fromFilePairs(params.inputDir+'/'+params.inputPattern, size: 2, checkIfExists: true)  ]
+                 : [Channel.fromFilePairs(params.inputDir+'/'+params.inputPattern, size: 2, checkIfExists: true), Channel.empty() ] )
 
 process ERValign {
     tag "${sample}"
@@ -37,22 +41,24 @@ process ERValign {
     memory '35 GB'
     scratch true
     cpus params.cpus
-    publishDir params.outputDir
+    publishDir params.outputDir, mode: 'copy'
+    stageOutMode 'rsync'
 
     // other configuration
     echo true
     errorStrategy 'terminate'
 
     input:
-    tuple val(sample), file (reads) from pairFiles_ch
+    tuple val (sample), path (reads) from fastqPairs_ch
     val (localOutputDir) from params.localOutputDir
     val (limitMemory) from params.limitMemory
     val (debug) from params.debug
     
     output:
-    path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam") into bam_ch
-    path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam.bai") into bai_ch
-    val (sample) into prefix_ch
+    tuple sample, path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam*") into star_bam_ch  
+
+    when:
+    !params.skipAlignment
 
     shell:
     template 'ERValign.sh'
@@ -73,10 +79,8 @@ process ERVcount {
     stageInMode 'symlink'
     
     input:
-    val (sample) from prefix_ch
+    tuple val (sample), path (bam) from bamPairs_ch.mix(star_bam_ch) // mixing with the channel from ERValign if started from FASTQs and skipAlignment=false
     val (debug) from params.debug
-    path (bam) from bam_ch
-    path (bai) from bai_ch
     
     output: 
     path ("${sample}"+'.ERVresults.txt') into final_results_ch

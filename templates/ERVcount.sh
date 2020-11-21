@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BAM="!{bam}"
+BAM="!{bam[0]}"
 _DEBUG="!{debug}"
 
 logMsg() {

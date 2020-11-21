@@ -92,7 +92,8 @@ where `nextflow.config` include the minimum set of parameters to run ERVmap with
 params {
     genome='/path/to/genome'               # external path to the indexed genome for the STAR aligner
     inputDir='path/to/input/folder'        # external path of the input data
-    inputPattern="*{1,2}.fastq.gz"         # pattern to search for input FASTQ files
+    inputPattern="*{1,2}.fastq.gz"         # pattern to search for input FASTQ files, or BAM files (*.{bam,bam.bai})
+    skipAlignment=false                    # if skipAlignment is true, the process ERValign is skipped, and the input dir and pattern should point to the BAM files
     outputDir='/path/to/output/folder'     # external path of the output results
     starTmpDir='/path/to/STAR/temp/folder' # external path of the STAR aligner temporary folder. REQUIRED
     localOutDir='.'                        # internal path of the results
@@ -103,7 +104,7 @@ params {
 ```
 **NOTE:** Adjust the memory settings of the docker container if needed, but recall that STAR requires about 32G of RAM (see [Optional Parameters](#optparam)).
 
-**NOTE:** If you need to keep the BAM files generated, please make sure to make a copy. By default, the BAMs remains in the nextflow `work` folder and only symbolic links are available in `outputDir`. By cleaning up the `work` folder, e.g. by running `nextflow clean`, the bam files will be removed. The ERVmap results are copied into `outputDir` and thus are permanent.
+**NOTE:** The BAM files are rsync'ed into the `outputDir` folder. Make sure to have sufficient disk space. By cleaning up the `work` folder, e.g. by running `nextflow clean`, the bam files will be removed. The ERVmap results are copied into `outputDir` and thus are permanent.
 
 ----
 
