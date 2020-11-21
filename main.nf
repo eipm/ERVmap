@@ -29,9 +29,11 @@ if (!params.debug) {
 }
 
 // Adding the option to skip the alignment if skipAlignment is set to true.
-(pairFiles_ch, bam_ch, bai_ch) = ( params.skipAlignment
-                 ? [Channel.empty(), Channel.fromPath( params.inputDir+'/*bam'), Channel.fromPath(params.inputDir+'/*bai') ]
-                 : [Channel.fromFilePairs( params.inputDir+'/'+params.inputPattern, size: 2, checkIfExists: true ), Channel.empty(), Channel.empty() ] )
+(fastqPairs_ch, bamPairs_ch) = ( params.skipAlignment
+                 ? [Channel.empty(), Channel.fromFilePairs( params.inputDir+'/'+params.inputPattern, checkIfExists: true )  ]
+                 : [Channel.fromFilePairs( params.inputDir+'/'+params.inputPattern, size: 2, checkIfExists: true ), Channel.empty() ] )
+
+bamPairs_ch.flatten().collate(3).set { newBamPairs_ch }
 
 process ERValign {
     tag "${sample}"
@@ -41,53 +43,58 @@ process ERValign {
     memory '35 GB'
     scratch true
     cpus params.cpus
-    publishDir params.outputDir
+    publishDir params.outputDir, mode: 'copy'
+    stageOutMode 'rsync'
 
     // other configuration
     echo true
     errorStrategy 'terminate'
 
     input:
-    tuple val(sample), file (reads) from pairFiles_ch
+    tuple val(sample), path (reads) from fastqPairs_ch
     val (localOutputDir) from params.localOutputDir
     val (limitMemory) from params.limitMemory
     val (debug) from params.debug
     
     output:
-    path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam") into star_bam_ch  
-    path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam.bai") into star_bai_ch
-    val (sample) into prefix_ch
+    tuple sample, path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam*") into star_bam_ch  
+    // path ("${localOutputDir}/${sample}.Aligned.sortedByCoord.out.bam.bai") into star_bai_ch
+    // val (sample) into prefix_ch
+
+    when:
+    !params.skipAlignment
 
     shell:
     template 'ERValign.sh'
 }
+star_bam_ch.subscribe{ println "File: ${it.name} => ${it.text}" }
 
-process ERVcount {
-    tag "${sample}"
+// process ERVcount {
+//     tag "${sample}"
 
-    // executor configuration
-    time '3h'
-    memory '8.GB'
-    scratch true
-    storeDir params.outputDir
+//     // executor configuration
+//     time '3h'
+//     memory '8.GB'
+//     scratch true
+//     storeDir params.outputDir
 
-    // other configuration
-    echo true
-    errorStrategy 'terminate'
-    stageInMode 'symlink'
+//     // other configuration
+//     echo true
+//     errorStrategy 'terminate'
+//     stageInMode 'symlink'
     
-    input:
-    val (sample) from prefix_ch
-    val (debug) from params.debug
-    path (bam) from bam_ch.mix( star_bam_ch ) // mixing with the channel from ERValign if started from FASTQs and skipAlignment=false
-    path (bai) from bai_ch.mix( star_bai_ch)  // mixing with the channel from ERValign if started from FASTQs and skipAlignment=false
+//     input:
+//     tuple val(sample), path (bam), path (bai) from newBamPairs_ch
+//     val (debug) from params.debug
+//     // path (bam) from bam_ch.mix(star_bam_ch) // mixing with the channel from ERValign if started from FASTQs and skipAlignment=false
+//     // path (bai) from bai_ch.mix(star_bai_ch)  // mixing with the channel from ERValign if started from FASTQs and skipAlignment=false
     
-    output: 
-    path ("${sample}"+'.ERVresults.txt') into final_results_ch
+//     output: 
+//     path ("${sample}"+'.ERVresults.txt') into final_results_ch
 
-    shell:
-    template 'ERVcount.sh'
-}
+//     shell:
+//     template 'ERVcount.sh'
+// }
 
 // ~~~~~~~~~~~~~~~ PIPELINE COMPLETION EVENTS ~~~~~~~~~~~~~~~~~~~ //
 
