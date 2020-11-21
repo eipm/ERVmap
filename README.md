@@ -104,7 +104,7 @@ params {
 ```
 **NOTE:** Adjust the memory settings of the docker container if needed, but recall that STAR requires about 32G of RAM (see [Optional Parameters](#optparam)).
 
-**NOTE:** The BAM files are rsync'ed into the `outputDir` folder. Make sure to have sufficient disk space on the. By cleaning up the `work` folder, e.g. by running `nextflow clean`, the bam files will be removed. The ERVmap results are copied into `outputDir` and thus are permanent.
+**NOTE:** The BAM files are rsync'ed into the `outputDir` folder. Make sure to have sufficient disk space. By cleaning up the `work` folder, e.g. by running `nextflow clean`, the bam files will be removed. The ERVmap results are copied into `outputDir` and thus are permanent.
 
 ----
 
