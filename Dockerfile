@@ -75,7 +75,7 @@ RUN chmod ugo+wx /results /STAR_tmp
 COPY ERVmapping.sh /scripts
 COPY templates/ERValign.sh /scripts
 COPY templates/ERVcount.sh /scripts
-COPY hg38cut_L1_ERV.sorted.bed /resources/ERVmap.bed
+COPY hg38cut_L1_ERV.sorteda.bed /resources/ERVmap.bed
 
 #Set Working Directory
 WORKDIR /scripts
